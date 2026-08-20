@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: chinese-khmer-video-ai
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_TEXT_MODEL
+        value: gpt-5.6-luna
+      - key: OPENAI_TRANSCRIBE_MODEL
+        value: gpt-4o-transcribe
+      - key: OPENAI_TTS_MODEL
+        value: gpt-4o-mini-tts
+      - key: OPENAI_TTS_VOICE
+        value: alloy
+      - key: MAX_UPLOAD_MB
+        value: "500"
