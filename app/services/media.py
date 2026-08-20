@@ -1,3 +1,1 @@
-make_timed_audio
-make_srt
-render_final
+
