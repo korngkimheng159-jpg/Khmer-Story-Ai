@@ -1,1 +1,735 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Khmer Story AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Noto Sans Khmer",
+        "Khmer OS",
+        Arial,
+        sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    .container {
+      width: min(900px, 94%);
+      margin: 0 auto;
+      padding: 30px 0 60px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 20px 10px 30px;
+    }
+
+    .logo {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 15px;
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #6c5ce7, #4f8cff);
+      color: white;
+      font-size: 36px;
+      box-shadow: 0 12px 30px rgba(79, 140, 255, .25);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      color: #667085;
+      font-size: 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 22px;
+      padding: 24px;
+      margin-top: 18px;
+      box-shadow: 0 8px 30px rgba(20, 30, 50, .08);
+    }
+
+    .upload-box {
+      border: 2px dashed #cdd5e1;
+      border-radius: 18px;
+      padding: 35px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .upload-box:hover {
+      border-color: #4f8cff;
+      background: #f8faff;
+    }
+
+    .upload-icon {
+      font-size: 45px;
+      margin-bottom: 12px;
+    }
+
+    .upload-title {
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .upload-help {
+      color: #667085;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .file-name {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #f2f4f7;
+      display: none;
+      word-break: break-word;
+    }
+
+    .button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 15px;
+      margin-top: 18px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, #4f8cff, #6c5ce7);
+    }
+
+    .button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      display: none;
+      text-align: center;
+      margin-top: 22px;
+    }
+
+    .spinner {
+      width: 45px;
+      height: 45px;
+      margin: 0 auto 15px;
+      border: 5px solid #e5e7eb;
+      border-top-color: #4f8cff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .status-title {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .status-text {
+      color: #667085;
+      margin-top: 7px;
+      line-height: 1.7;
+    }
+
+    .result {
+      display: none;
+    }
+
+    .success {
+      padding: 15px;
+      border-radius: 14px;
+      background: #ecfdf3;
+      color: #027a48;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    video {
+      width: 100%;
+      max-height: 500px;
+      border-radius: 16px;
+      background: #000;
+      display: block;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border-radius: 13px;
+      padding: 14px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .download-video {
+      color: white;
+      background: #2563eb;
+    }
+
+    .download-subtitle {
+      color: #172033;
+      background: #e9eef7;
+    }
+
+    .segments {
+      margin-top: 22px;
+    }
+
+    .segments h3 {
+      margin-bottom: 12px;
+    }
+
+    .segment {
+      padding: 14px;
+      border-radius: 13px;
+      background: #f7f8fa;
+      margin-bottom: 10px;
+    }
+
+    .segment-time {
+      color: #4f8cff;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .segment-text {
+      line-height: 1.7;
+    }
+
+    .error {
+      display: none;
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 13px;
+      background: #fef3f2;
+      color: #b42318;
+      line-height: 1.6;
+    }
+
+    .footer {
+      text-align: center;
+      color: #98a2b3;
+      font-size: 13px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding-top: 15px;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
+
+      .card {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="hero">
+      <div class="logo">🎬</div>
+
+      <h1>Khmer Story AI</h1>
+
+      <div class="subtitle">
+        បម្លែងវីដេអូចិន → សំឡេង → អក្សរខ្មែរ → Subtitle 🎯
+      </div>
+    </div>
+
+
+    <!-- Upload -->
+    <div class="card">
+
+      <label for="videoInput" class="upload-box">
+
+        <div class="upload-icon">📹</div>
+
+        <div class="upload-title">
+          ជ្រើសរើសវីដេអូ
+        </div>
+
+        <div class="upload-help">
+          ចុចទីនេះដើម្បីជ្រើសរើស MP4 / MOV / M4V
+        </div>
+
+      </label>
+
+      <input
+        id="videoInput"
+        type="file"
+        accept=".mp4,.mov,.m4v,video/mp4,video/quicktime"
+      >
+
+      <div id="fileName" class="file-name"></div>
+
+      <button
+        id="processButton"
+        class="button"
+        disabled
+      >
+        🚀 ចាប់ផ្តើមបម្លែង
+      </button>
+
+      <div id="errorBox" class="error"></div>
+
+    </div>
+
+
+    <!-- Processing -->
+    <div id="statusBox" class="card status">
+
+      <div class="spinner"></div>
+
+      <div class="status-title">
+        កំពុងដំណើរការ...
+      </div>
+
+      <div class="status-text">
+        កំពុងបំបែកសំឡេងពីវីដេអូ<br>
+        កំពុងសម្រាយសំឡេងចិន<br>
+        កំពុងបង្កើតអក្សរខ្មែរ និង Subtitle<br>
+        សូមរង់ចាំបន្តិច...
+      </div>
+
+    </div>
+
+
+    <!-- Result -->
+    <div id="resultBox" class="card result">
+
+      <div class="success">
+        ✅ បម្លែងបានជោគជ័យ!
+      </div>
+
+      <video id="resultVideo" controls></video>
+
+      <div class="actions">
+
+        <a
+          id="downloadVideo"
+          class="action download-video"
+          href="#"
+          download
+        >
+          ⬇️ Download MP4
+        </a>
+
+        <a
+          id="downloadSubtitle"
+          class="action download-subtitle"
+          href="#"
+          download
+        >
+          📝 Download Khmer SRT
+        </a>
+
+      </div>
+
+
+      <div class="segments">
+
+        <h3>📝 Khmer Subtitle</h3>
+
+        <div id="segmentsList"></div>
+
+      </div>
+
+    </div>
+
+
+    <div class="footer">
+      Khmer Story AI • Chinese → Khmer Video AI
+    </div>
+
+  </div>
+
+
+  <script>
+
+    const videoInput = document.getElementById("videoInput");
+    const fileName = document.getElementById("fileName");
+    const processButton = document.getElementById("processButton");
+
+    const statusBox = document.getElementById("statusBox");
+    const resultBox = document.getElementById("resultBox");
+
+    const resultVideo = document.getElementById("resultVideo");
+
+    const downloadVideo = document.getElementById("downloadVideo");
+    const downloadSubtitle = document.getElementById("downloadSubtitle");
+
+    const segmentsList = document.getElementById("segmentsList");
+    const errorBox = document.getElementById("errorBox");
+
+
+    // ==============================
+    // Select video
+    // ==============================
+
+    videoInput.addEventListener("change", function () {
+
+      const file = this.files[0];
+
+      if (!file) {
+        processButton.disabled = true;
+        fileName.style.display = "none";
+        return;
+      }
+
+      fileName.textContent =
+        "🎬 " + file.name;
+
+      fileName.style.display = "block";
+
+      processButton.disabled = false;
+
+      errorBox.style.display = "none";
+      resultBox.style.display = "none";
+    });
+
+
+    // ==============================
+    // Process video
+    // ==============================
+
+    processButton.addEventListener("click", async function () {
+
+      const file = videoInput.files[0];
+
+      if (!file) {
+        showError("សូមជ្រើសរើសវីដេអូមួយសិន។");
+        return;
+      }
+
+
+      // Check extension
+
+      const allowed = [
+        ".mp4",
+        ".mov",
+        ".m4v"
+      ];
+
+      const name = file.name.toLowerCase();
+
+      const valid = allowed.some(ext =>
+        name.endsWith(ext)
+      );
+
+      if (!valid) {
+        showError(
+          "ប្រភេទវីដេអូមិនត្រូវបានគាំទ្រ។ សូមប្រើ MP4, MOV ឬ M4V។"
+        );
+
+        return;
+      }
+
+
+      // UI
+
+      processButton.disabled = true;
+
+      statusBox.style.display = "block";
+
+      resultBox.style.display = "none";
+
+      errorBox.style.display = "none";
+
+
+      try {
+
+        const formData = new FormData();
+
+        formData.append("video", file);
+
+
+        const response = await fetch(
+          "/api/process",
+          {
+            method: "POST",
+            body: formData
+          }
+        );
+
+
+        let data = {};
+
+        try {
+          data = await response.json();
+        } catch (e) {
+          throw new Error(
+            "Server មិនបានបញ្ជូន JSON ត្រឡប់មកវិញ។"
+          );
+        }
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            data.detail ||
+            data.message ||
+            "មានបញ្ហាក្នុងការដំណើរការវីដេអូ។"
+          );
+
+        }
+
+
+        if (!data.job_id) {
+
+          throw new Error(
+            "Server មិនបានបញ្ជូន job_id មកទេ។"
+          );
+
+        }
+
+
+        // ==========================
+        // URLs
+        // ==========================
+
+        const videoUrl =
+          data.download_url ||
+          `/api/download/${data.job_id}`;
+
+        const subtitleUrl =
+          data.subtitle_url ||
+          `/api/subtitles/${data.job_id}`;
+
+
+        // Video preview
+
+        resultVideo.src = videoUrl;
+
+        resultVideo.load();
+
+
+        // Download buttons
+
+        downloadVideo.href = videoUrl;
+
+        downloadSubtitle.href = subtitleUrl;
+
+
+        // ==========================
+        // Segments
+        // ==========================
+
+        segmentsList.innerHTML = "";
+
+        if (
+          Array.isArray(data.segments) &&
+          data.segments.length > 0
+        ) {
+
+          data.segments.forEach((segment, index) => {
+
+            const item =
+              document.createElement("div");
+
+            item.className = "segment";
+
+
+            const time =
+              document.createElement("div");
+
+            time.className = "segment-time";
+
+            const start =
+              formatTime(
+                segment.start
+              );
+
+            const end =
+              formatTime(
+                segment.end
+              );
+
+            time.textContent =
+              `${start} → ${end}`;
+
+
+            const text =
+              document.createElement("div");
+
+            text.className = "segment-text";
+
+            text.textContent =
+              segment.khmer ||
+              segment.text ||
+              segment.translated ||
+              "";
+
+
+            item.appendChild(time);
+
+            item.appendChild(text);
+
+            segmentsList.appendChild(item);
+
+          });
+
+        } else {
+
+          segmentsList.innerHTML =
+            `<div class="segment">
+              Subtitle ត្រូវបានបង្កើតរួចហើយ។
+            </div>`;
+
+        }
+
+
+        // Show result
+
+        statusBox.style.display = "none";
+
+        resultBox.style.display = "block";
+
+
+        // Scroll
+
+        resultBox.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        statusBox.style.display = "none";
+
+        showError(
+          error.message ||
+          "មានបញ្ហាមិនស្គាល់ក្នុងការដំណើរការ។"
+        );
+
+      }
+
+
+      processButton.disabled = false;
+
+    });
+
+
+    // ==============================
+    // Error
+    // ==============================
+
+    function showError(message) {
+
+      errorBox.textContent =
+        "❌ " + message;
+
+      errorBox.style.display = "block";
+
+    }
+
+
+    // ==============================
+    // Time formatter
+    // ==============================
+
+    function formatTime(seconds) {
+
+      if (
+        seconds === undefined ||
+        seconds === null ||
+        isNaN(seconds)
+      ) {
+        return "--:--";
+      }
+
+      seconds = Number(seconds);
+
+      const hours =
+        Math.floor(seconds / 3600);
+
+      const minutes =
+        Math.floor(
+          (seconds % 3600) / 60
+        );
+
+      const secs =
+        Math.floor(seconds % 60);
+
+
+      if (hours > 0) {
+
+        return (
+          String(hours).padStart(2, "0") +
+          ":" +
+          String(minutes).padStart(2, "0") +
+          ":" +
+          String(secs).padStart(2, "0")
+        );
+
+      }
+
+
+      return (
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(secs).padStart(2, "0")
+      );
+
+    }
+
+  </script>
+
+</body>
+</html>
