@@ -71,7 +71,7 @@ async def process(video: UploadFile = File(...), style: str = Form("short")):
         ])
 
         transcript = transcribe_chinese(audio)
-        segments = make_khmer_segments(transcript, style)
+        segments = make_khmer_segments(transcript)
 
         voices = []
         for i, seg in enumerate(segments):
