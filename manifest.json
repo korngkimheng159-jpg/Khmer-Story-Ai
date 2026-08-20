@@ -1,0 +1,8 @@
+{
+  "name": "Chinese Khmer Video AI",
+  "short_name": "Video AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f4f6",
+  "theme_color": "#111111"
+}

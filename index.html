@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<link rel="manifest" href="/static/manifest.json">
+<title>Chinese → Khmer Video AI</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f4f6;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:540px;margin:auto;padding:20px 16px 45px}.hero{text-align:center;padding:24px 0}
+h1{font-size:30px;margin:0 0 8px}.muted{color:#6b6b70}.card{background:#fff;border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 7px 28px #0000000c}
+.upload{display:block;border:2px dashed #b8b8bd;border-radius:18px;padding:28px 12px;text-align:center}.upload input{display:none}.emoji{font-size:44px}
+select,button{width:100%;padding:16px;margin-top:12px;border-radius:14px;font-size:16px}select{border:0;background:#f0f0f2}button{border:0;background:#111;color:#fff;font-weight:700}
+button:disabled{opacity:.5}video{width:100%;border-radius:16px;margin-top:14px}a{display:block;margin-top:14px;padding:14px;border-radius:12px;background:#eee;text-align:center;color:#111;text-decoration:none;font-weight:600}
+#status{text-align:center;margin-top:14px;font-weight:700;min-height:22px}.hidden{display:none}pre{white-space:pre-wrap;line-height:1.65;background:#f5f5f5;padding:12px;border-radius:12px}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<h1>🇨🇳 → 🇰🇭</h1>
+<div class="muted">Chinese Video AI</div>
+</section>
+
+<section class="card">
+<label class="upload">
+<input id="file" type="file" accept="video/*">
+<div class="emoji">🎬</div>
+<strong id="filename">ជ្រើសរើសវីដេអូ</strong>
+<div class="muted">Photos / Files • MP4, MOV, M4V, WEBM, MKV</div>
+</label>
+
+<select id="style">
+<option value="short">សម្រាយខ្លី — TikTok / Shorts</option>
+<option value="normal">សម្រាយធម្មតា</option>
+<option value="detail">សម្រាយលម្អិត</option>
+</select>
+
+<button id="go">✨ សម្រាយវីដេអូ</button>
+<div id="status"></div>
+</section>
+
+<section id="result" class="card hidden">
+<h3>🎬 លទ្ធផល</h3>
+<video id="preview" controls playsinline></video>
+<a id="download" download="khmer-video.mp4">⬇️ Save / Share MP4</a>
+<a id="subtitle">📝 Download Khmer SRT</a>
+<details><summary>ស្គ្រីបសម្រាយ</summary><pre id="script"></pre></details>
+</section>
+</main>
+
+<script>
+const file=document.getElementById("file");
+const filename=document.getElementById("filename");
+const go=document.getElementById("go");
+const status=document.getElementById("status");
+const result=document.getElementById("result");
+
+file.addEventListener("change",()=>{
+  filename.textContent=file.files[0]?.name||"ជ្រើសរើសវីដេអូ";
+});
+
+go.addEventListener("click",async()=>{
+  if(!file.files[0]) return alert("សូមជ្រើសរើសវីដេអូជាមុន");
+  const fd=new FormData();
+  fd.append("video",file.files[0]);
+  fd.append("style",document.getElementById("style").value);
+
+  go.disabled=true;
+  status.textContent="⏳ កំពុងស្តាប់ភាសាចិន...";
+  try{
+    const r=await fetch("/api/process",{method:"POST",body:fd});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.detail||"Processing failed");
+
+    document.getElementById("preview").src=d.download_url;
+    document.getElementById("download").href=d.download_url;
+    document.getElementById("subtitle").href=d.subtitle_url;
+    document.getElementById("script").textContent=d.segments.map(x=>x.khmer).join("\n");
+    result.classList.remove("hidden");
+    status.textContent="✅ រួចរាល់!";
+  }catch(e){
+    status.textContent="❌ "+e.message;
+  }finally{
+    go.disabled=false;
+  }
+});
+</script>
+</body>
+</html>
